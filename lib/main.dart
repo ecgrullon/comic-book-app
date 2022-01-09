@@ -9,24 +9,24 @@ import 'app/routes/app_pages.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 class MyApp extends StatelessWidget {
+  
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-
       title: 'comicbook app',
       debugShowCheckedModeBanner: false,
       theme: ThemeData( 
-        primaryColor:  Colors.white,
-        fontFamily: 'Poppins',
+        brightness: Brightness.dark,
       ),
       getPages: AppPages.pages,
       home: HomePage(),
       initialBinding:  HomeBinding(),
-      // home: SplashPage(),
-      // initialBinding: SplashBinding(),
+
 
     );
   }

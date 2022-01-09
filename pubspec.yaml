@@ -38,6 +38,9 @@ dependencies:
   dio:
   jwt_decode:
   flutter_dotenv:
+  jiffy:
+  flutter_staggered_grid_view:
+  flutter_html:
 
 dev_dependencies:
   flutter_test:
