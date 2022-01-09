@@ -61,56 +61,64 @@ class HomePage extends StatelessWidget {
       );
     }
 
-
- _buildItemList(Issue issue, HomeController controller) {
-      double imageH = (400 / 600) * (Get.width / 2) * 0.8;
-      return SizedBox(
-        width: Get.width,
-        height: Get.height * 0.3,
-        child: InkWell(
-          onTap: () => controller.goToDetail(issue),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Hero(
-                tag: "issue_${issue.id}",
-                child: Container(
-                    decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0XFF20202c),
-                            spreadRadius: 0,
-                            blurRadius: 12,
-                            offset: Offset(2, 8),
-                          )
-                        ]),
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8), // Image border
-                        child: Image.network(issue.image!,
-                            fit: BoxFit.cover,
-                            width: (Get.width / 2) * 0.88,
-                            height: imageH))),
-              ),
-              const SizedBox(height: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("${issue.name ?? 'N/A'} #${issue.issueNumber}",
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 22)),
-                  const SizedBox(height: 4),
-                  Text(
-                    Jiffy(issue.dateAdded).format('MMMM dd, yyyy'),
-                    style: const TextStyle(color: Color(0xFFa6a5af), fontSize: 18),
-                  )
-                ],
-              ),
-            ],
+    _buildItemList(Issue issue, HomeController controller) {
+      double imageH = (400 / 600) * (Get.width / 2);
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 28),
+        child: SizedBox(
+          width: Get.width * 0.6,
+          child: InkWell(
+            onTap: () => controller.goToDetail(issue),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Hero(
+                  tag: "issue_${issue.id}",
+                  child: Container(
+                      decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0XFF20202c),
+                              spreadRadius: 0,
+                              blurRadius: 12,
+                              offset: Offset(2, 8),
+                            )
+                          ]),
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8), // Image border
+                          child: Image.network(issue.image!,
+                              fit: BoxFit.cover,
+                              width: (Get.width / 2) * 0.5,
+                              height: imageH))),
+                ),
+                const SizedBox(width: 16),
+                Container(
+                  padding: const EdgeInsets.only(top: 8),
+                  width: Get.width * 0.6,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("${issue.name ?? 'N/A'} #${issue.issueNumber}",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20), maxLines: 3),
+                      const SizedBox(height: 4),
+                      Text(
+                        Jiffy(issue.dateAdded).format('MMMM dd, yyyy'),
+                        style:
+                            const TextStyle(color: Color(0xFFa6a5af), fontSize: 18),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
     }
+
     return GetBuilder<HomeController>(
         builder: (_) => Scaffold(
             appBar: AppBar(
@@ -132,14 +140,16 @@ class HomePage extends StatelessWidget {
                           style: TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 20)),
                       Row(children: [
-                        IconButton(
-                            iconSize: 32,
-                            onPressed: () {},
-                            icon: const Icon(Icons.view_list)),
-                        IconButton(
-                            iconSize: 32,
-                            onPressed: () {},
-                            icon: const Icon(Icons.grid_view))
+                        Obx(() => IconButton(
+                              iconSize: 32,
+                              onPressed: () => _.changeListMode(),
+                              icon: Icon(Icons.view_list, color: _.listGrid.value ? Colors.white : Colors.purpleAccent,)),
+                        ),
+                               Obx(() => IconButton(
+                              iconSize: 32,
+                               onPressed: () => _.changeListMode(),
+                              icon: Icon(Icons.grid_view, color: _.listGrid.value ? Colors.purpleAccent : Colors.white,)),
+                        ),
                       ])
                     ],
                   ),
@@ -147,19 +157,26 @@ class HomePage extends StatelessWidget {
                 Obx(
                   () => _.loading.value
                       ? const Center(child: CircularProgressIndicator())
-
-                     : ListView.builder(
+                      : _.listGrid.value ? 
+                        AlignedGridView.count(
                         itemCount: _.issues.length,
-                        itemBuilder: (context, index) => _buildItemList(_.issues[index], _)),
-                      
-                      // : AlignedGridView.count(
-                      //     itemCount: _.issues.length,
-                      //     shrinkWrap: true,
-                      //     physics: const ScrollPhysics(),
-                      //     crossAxisCount: 2,
-                      //     mainAxisSpacing: 26,
-                      //     itemBuilder: (context, index) =>
-                      //         _buildItemGrid(_.issues[index], _)),
+                        shrinkWrap: true,
+                        physics: const ScrollPhysics(),
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 26,
+                        itemBuilder: (context, index) =>
+                            _buildItemGrid(_.issues[index], _))
+                        
+                      : ListView.builder(
+                          
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: _.issues.length,
+                          shrinkWrap: true,
+                          physics: const ScrollPhysics(),
+                          itemBuilder: (context, index) =>
+                              _buildItemList(_.issues[index], _)),
+
+                
                 ),
               ],
             ))));
