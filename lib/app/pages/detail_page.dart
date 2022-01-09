@@ -12,6 +12,9 @@ class DetailPage extends StatelessWidget {
   const DetailPage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    var smallestDimension = MediaQuery.of(context).size.shortestSide;
+    final useMobileLayout = smallestDimension < 600;
+    
     Widget _buildImage(Issue issue) {
       double imageH = (400 / 600) * (Get.height * 0.8);
 
@@ -33,12 +36,14 @@ class DetailPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8), // Image border
                 child: Image.network(issue.image!,
                     fit: BoxFit.cover,
-                    width: Get.width * 0.8,
+                    width: Get.width *  (useMobileLayout ? 0.8 : 0.5),
                     height: imageH))),
       ));
     }
 
     Widget _buildListItem(CreditDetail creditDetail) {
+
+      double imgSize = useMobileLayout ? 50 : 80;
       return Row(children: [
         Container(
             decoration: const BoxDecoration(
@@ -55,19 +60,19 @@ class DetailPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8), // Image border
                 child: Stack(
                   children: [
-                    Container(color: const Color(0xFF3b3b56), width: 50, height: 50),
+                    Container(color: const Color(0xFF3b3b56), width: imgSize, height: imgSize),
 
                     Image.network(creditDetail.image!,
-                        fit: BoxFit.fill, width: 50, height: 50),
+                        fit: BoxFit.fill, width:  imgSize, height: imgSize),
 
                   ],
                 ))),
         const SizedBox(width: 12),
         SizedBox(
-          width: 110,
+          width: useMobileLayout ? 110 : 220,
           child: Text(
             creditDetail.name ?? 'N/A',
-            style: const TextStyle(fontSize: 14),
+            style: TextStyle(fontSize: (useMobileLayout ? 14 : 17)),
           ),
         )
       ]);

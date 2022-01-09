@@ -10,6 +10,9 @@ class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    var smallestDimension = MediaQuery.of(context).size.shortestSide;
+    final useMobileLayout = smallestDimension < 600;
+
     _buildItemGrid(Issue issue, HomeController controller) {
       double imageH = (400 / 600) * 420;
       return InkWell(
@@ -32,10 +35,18 @@ class HomePage extends StatelessWidget {
                       ]),
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(8), // Image border
-                      child: Image.network(issue.image!,
-                          fit: BoxFit.cover,
-                          width: (Get.width / 2) * 0.88,
-                          height: imageH))),
+                      child: Stack(
+                        children: [
+                          Container(
+                              color: const Color(0xFF3b3b56),
+                              width: (Get.width / 2) * 0.88,
+                              height: imageH),
+                          Image.network(issue.image!,
+                              fit: BoxFit.cover,
+                              width: (Get.width / 2) * 0.88,
+                              height: imageH),
+                        ],
+                      ))),
             ),
             const SizedBox(height: 16),
             Align(
@@ -86,11 +97,20 @@ class HomePage extends StatelessWidget {
                             )
                           ]),
                       child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8), // Image border
-                          child: Image.network(issue.image!,
-                              fit: BoxFit.cover,
+                          borderRadius:
+                              BorderRadius.circular(8), // Image border
+                          child: Stack(
+                            children: [
+                               Container(
+                              color: const Color(0xFF3b3b56),
                               width: (Get.width / 2) * 0.5,
-                              height: imageH))),
+                              height: imageH),
+                              Image.network(issue.image!,
+                                  fit: BoxFit.cover,
+                                  width: (Get.width / 2) * 0.5,
+                                  height: imageH),
+                            ],
+                          ))),
                 ),
                 const SizedBox(width: 16),
                 Container(
@@ -102,12 +122,13 @@ class HomePage extends StatelessWidget {
                     children: [
                       Text("${issue.name ?? 'N/A'} #${issue.issueNumber}",
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20), maxLines: 3),
+                              fontWeight: FontWeight.bold, fontSize: 20),
+                          maxLines: 3),
                       const SizedBox(height: 4),
                       Text(
                         Jiffy(issue.dateAdded).format('MMMM dd, yyyy'),
-                        style:
-                            const TextStyle(color: Color(0xFFa6a5af), fontSize: 18),
+                        style: const TextStyle(
+                            color: Color(0xFFa6a5af), fontSize: 18),
                       )
                     ],
                   ),
@@ -140,15 +161,27 @@ class HomePage extends StatelessWidget {
                           style: TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 20)),
                       Row(children: [
-                        Obx(() => IconButton(
+                        Obx(
+                          () => IconButton(
                               iconSize: 32,
                               onPressed: () => _.changeListMode(),
-                              icon: Icon(Icons.view_list, color: _.listGrid.value ? Colors.white : Colors.purpleAccent,)),
+                              icon: Icon(
+                                Icons.view_list,
+                                color: _.listGrid.value
+                                    ? Colors.white
+                                    : Colors.purpleAccent,
+                              )),
                         ),
-                               Obx(() => IconButton(
+                        Obx(
+                          () => IconButton(
                               iconSize: 32,
-                               onPressed: () => _.changeListMode(),
-                              icon: Icon(Icons.grid_view, color: _.listGrid.value ? Colors.purpleAccent : Colors.white,)),
+                              onPressed: () => _.changeListMode(),
+                              icon: Icon(
+                                Icons.grid_view,
+                                color: _.listGrid.value
+                                    ? Colors.purpleAccent
+                                    : Colors.white,
+                              )),
                         ),
                       ])
                     ],
@@ -157,26 +190,26 @@ class HomePage extends StatelessWidget {
                 Obx(
                   () => _.loading.value
                       ? const Center(child: CircularProgressIndicator())
-                      : _.listGrid.value ? 
-                        AlignedGridView.count(
-                        itemCount: _.issues.length,
-                        shrinkWrap: true,
-                        physics: const ScrollPhysics(),
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 26,
-                        itemBuilder: (context, index) =>
-                            _buildItemGrid(_.issues[index], _))
-                        
-                      : ListView.builder(
-                          
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: _.issues.length,
-                          shrinkWrap: true,
-                          physics: const ScrollPhysics(),
-                          itemBuilder: (context, index) =>
-                              _buildItemList(_.issues[index], _)),
-
-                
+                      : _.listGrid.value
+                          ? AlignedGridView.count(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: useMobileLayout ? 0 : 16),
+                              itemCount: _.issues.length,
+                              shrinkWrap: true,
+                              physics: const ScrollPhysics(),
+                              crossAxisCount: useMobileLayout ? 2 : 4,
+                              mainAxisSpacing: 26,
+                              crossAxisSpacing: useMobileLayout ? 0 : 16,
+                              itemBuilder: (context, index) =>
+                                  _buildItemGrid(_.issues[index], _))
+                          : ListView.builder(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              itemCount: _.issues.length,
+                              shrinkWrap: true,
+                              physics: const ScrollPhysics(),
+                              itemBuilder: (context, index) =>
+                                  _buildItemList(_.issues[index], _)),
                 ),
               ],
             ))));
